@@ -5,8 +5,8 @@
 Before you begin, make sure you have the following installed:
 
 - `npm install`
-- Express Js (installation: `npm intall express`)
-- CORS  (installation: `npm intall cors`)
+- Express Js (installation: `npm install express`)
+- CORS  (installation: `npm install cors`)
 
 ## Installation and launch
 
