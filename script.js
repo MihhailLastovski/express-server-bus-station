@@ -47,6 +47,7 @@ function checkLoginStatus() {
     }
 }
 const routesTable = document.getElementById('routesTable');
+const logsTable = document.getElementById('logsTable');
 
 async function fetchRoutes(username, password) {
     try 
@@ -69,7 +70,8 @@ async function fetchRoutes(username, password) {
                 }
             });
             const allRoutes = await allRoutesResponse.json();
-            renderRoutes(allRoutes, data.role);   
+            renderRoutes(allRoutes, data.role);  
+            renderLogs(); 
         } 
         else 
         {
@@ -110,12 +112,37 @@ function renderRoutes(routesData, userRole)
     }
 }
 
+async function renderLogs()
+{
+    const allLogsResponse = await fetch('http://localhost:32149/Logs/logs', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    const allLogs = await allLogsResponse.json();
+    logsTable.innerHTML = '';
+
+    allLogs.forEach(log => {
+        const row = `
+            <tr>
+                <td>${log.action}</td>               
+                <td>${log.username}</td>               
+                <td>${log.timestamp.replace('T', ' ')}</td>               
+            </tr>
+        `;
+        logsTable.innerHTML += row;
+    });
+
+}
 
 async function deleteRoute(routeId) 
 {
     try 
     {
-        const response = await fetch(`http://localhost:32149/Routes/routes/${routeId}`, 
+        const user = getUser();
+        const response = await fetch(`http://localhost:32149/Routes/routes/${routeId}/${user.username}`, 
         {
             method: 'DELETE'
         });
@@ -143,7 +170,8 @@ async function deleteRouteFromModal()
 
     try 
     {
-        const response = await fetch(`http://localhost:32149/Routes/routes/${routeId}`, 
+        const user = getUser();
+        const response = await fetch(`http://localhost:32149/Routes/routes/${routeId}/${user.username}`, 
         {
             method: 'DELETE'
         });
@@ -202,7 +230,8 @@ async function updateRouteInTable()
 
     try 
     {
-        const response = await fetch(`http://localhost:32149/Routes/routes/${updatedRouteData.id}/${updatedRouteData.departure_location}/${updatedRouteData.destination}/${updatedRouteData.departure_time}`, 
+        const user = getUser();
+        const response = await fetch(`http://localhost:32149/Routes/routes/${updatedRouteData.id}/${updatedRouteData.departure_location}/${updatedRouteData.destination}/${updatedRouteData.departure_time}/${user.username}`, 
         {
             method: 'PUT',
             headers: {
@@ -233,35 +262,6 @@ async function updateRouteInTable()
     }
 }
 
-async function updateRoute(routeId, updatedRouteData) 
-{
-    try 
-    {
-        const response = await fetch(`http://localhost:32149/Routes/routes/${routeId}`, 
-        {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedRouteData)
-        });
-
-        if (response.status === 200) 
-        {
-            const user = getUser();
-            fetchRoutes(user.username, user.password);
-        } 
-        else 
-        {
-            console.error('Failed to update route.');
-        }
-    } 
-    catch (error) 
-    {
-        console.error('Error updating route:', error);
-    }
-}
-
 async function addNewRoute() {
     const newRouteData = getFormData(true);
     const isEmpty = Object.values(newRouteData).some(value => value === null || value === undefined || value.trim() === '');
@@ -271,7 +271,8 @@ async function addNewRoute() {
     }
     try 
     {
-        const response = await fetch(`http://localhost:32149/Routes/routes/${newRouteData.departure_location}/${newRouteData.destination}/${newRouteData.departure_time}`, {
+        const user = getUser();
+        const response = await fetch(`http://localhost:32149/Routes/routes/${newRouteData.departure_location}/${newRouteData.destination}/${newRouteData.departure_time}/${user.username}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -345,6 +346,7 @@ async function loginUser() {
         if (response.status === 200) 
         {
             alert(data.message);
+            renderLogs();
             saveUser(username, password, data.role);
             fetchRoutes(username, password);
             toggleRouteBlock(data.role);   
@@ -411,18 +413,34 @@ function toggleRouteBlock(userRole) {
     const addRouteBlock = document.querySelector('.container.mt-5');
     const searchBlock = document.querySelector('#searchRegular');
     const sortBlock = document.querySelector('#sortRegular');
+    const logsBlock = document.querySelector('#logsTableDiv');
+    const routesBlock = document.querySelector('#tableRoutesDiv');
 
-    if (userRole !== 'employee') 
+
+    if (userRole === 'employee') 
     {
-        addRouteBlock.style.display = 'none'; 
-        searchBlock.style.display = 'block'; 
-        sortBlock.style.display = 'block'; 
-    } 
-    else 
-    {
+        logsBlock.style.display = 'none';
         addRouteBlock.style.display = 'block'; 
+        routesBlock.style.display = 'block'; 
         searchBlock.style.display = 'none'; 
         sortBlock.style.display = 'none'; 
+        
+    } 
+    else if (userRole === 'admin')
+    {
+        addRouteBlock.style.display = 'none'; 
+        searchBlock.style.display = 'none'; 
+        sortBlock.style.display = 'none'; 
+        logsBlock.style.display = 'block';
+        routesBlock.style.display = 'none'; 
+    }
+    else 
+    {
+        addRouteBlock.style.display = 'none'; 
+        logsBlock.style.display = 'none';
+        searchBlock.style.display = 'block'; 
+        sortBlock.style.display = 'block'; 
+        routesBlock.style.display = 'block'; 
     }
 }
 

@@ -10,7 +10,7 @@
 </head>
 <body>
     <style>
-        .container.mt-5, #searchRegular, #sortRegular{
+        .container.mt-5, #searchRegular, #sortRegular, #logsTableDiv{
             display: none;
         }
         header{
@@ -36,7 +36,7 @@
         <button type="button" class="btn btn-primary" onclick="filterByTime()">Sort by Time</button>
         <button type="button" class="btn btn-primary" onclick="filterAlphabetically()">Sort Alphabetically</button>
     </div>    
-    <div class="container mt-4">
+    <div class="container mt-4" id="tableRoutesDiv">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -47,6 +47,19 @@
                 </tr>
             </thead>
             <tbody id="routesTable">
+            </tbody>
+        </table>
+    </div>
+    <div class="container mt-4" id="logsTableDiv">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Username</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="logsTable">
             </tbody>
         </table>
     </div>
