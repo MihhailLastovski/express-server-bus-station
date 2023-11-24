@@ -92,9 +92,12 @@ function renderRoutes(routesData, userRole)
     routesData.forEach(route => {
         const row = `
             <tr>
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureTime}</td>` : `<td>${route.departureTime}</td>`}  
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destinationTime}</td>` : `<td>${route.destinationTime}</td>`}
                 ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureLocation}</td>` : `<td>${route.departureLocation}</td>`}                           
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destination}</td>` : `<td>${route.destination}</td>`}                           
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureTime}</td>` : `<td>${route.departureTime}</td>`}                           
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destination}</td>` : `<td>${route.destination}</td>`}                                          
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.busCompany}</td>` : `<td>${route.busCompany}</td>`}                           
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.ticketsCount}</td>` : `<td>${route.ticketsCount}</td>`}                                                    
                 ${userRole === 'employee' ? `<td><button class="btn btn-danger" onclick="deleteRoute(${route.id})">Delete</button></td>` : ''}
             </tr>
         `;
@@ -207,9 +210,12 @@ async function displayRouteInfo(routeId)
                 <input type="text" class="form-control" id="routeId" readonly value="${route.id}">
             </div>
             <table class="table table-striped">
+                <tr><th>Departure Time</th><td>${route.departureTime}</td></tr>
+                <tr><th>Destination Time</th><td>${route.destinationTime}</td></tr>
                 <tr><th>Departure Location</th><td>${route.departureLocation}</td></tr>
                 <tr><th>Destination</th><td>${route.destination}</td></tr>
-                <tr><th>Departure Time</th><td>${route.departureTime}</td></tr>
+                <tr><th>Bus Company</th><td>${route.busCompany}</td></tr>
+                <tr><th>Tickets</th><td>${route.ticketsCount}</td></tr>
             </table>
         `;
 
@@ -217,6 +223,9 @@ async function displayRouteInfo(routeId)
         document.getElementById('departureLocation').value = route.departureLocation;
         document.getElementById('destination').value = route.destination;
         document.getElementById('departureTime').value = route.departureTime;
+        document.getElementById('destinationTime').value = route.destinationTime;
+        document.getElementById('busCompany').value = route.busCompany;
+        document.getElementById('tickets').value = route.ticketsCount;
     } 
     catch (error)
     {
@@ -231,7 +240,7 @@ async function updateRouteInTable()
     try 
     {
         const user = getUser();
-        const response = await fetch(`http://localhost:32149/Routes/routes/${updatedRouteData.id}/${updatedRouteData.departure_location}/${updatedRouteData.destination}/${updatedRouteData.departure_time}/${user.username}`, 
+        const response = await fetch(`http://localhost:32149/Routes/routes/${updatedRouteData.id}/${updatedRouteData.departure_location}/${updatedRouteData.destination}/${updatedRouteData.departure_time}/${user.username}/${updatedRouteData.destinationtime}/${updatedRouteData.buscompany}/${updatedRouteData.tickets}`, 
         {
             method: 'PUT',
             headers: {
@@ -248,6 +257,9 @@ async function updateRouteInTable()
             document.getElementById('departureLocation').value = '';
             document.getElementById('destination').value = '';
             document.getElementById('departureTime').value = '';
+            document.getElementById('destinationTime').value = '';
+            document.getElementById('busCompany').value = '';
+            document.getElementById('tickets').value = '';
 
             $('#routeInfoModal').modal('hide'); 
         } 
@@ -272,7 +284,7 @@ async function addNewRoute() {
     try 
     {
         const user = getUser();
-        const response = await fetch(`http://localhost:32149/Routes/routes/${newRouteData.departure_location}/${newRouteData.destination}/${newRouteData.departure_time}/${user.username}`, {
+        const response = await fetch(`http://localhost:32149/Routes/routes/${newRouteData.departure_location}/${newRouteData.destination}/${newRouteData.departure_time}/${user.username}/${newRouteData.destinationtime}/${newRouteData.buscompany}/${newRouteData.tickets}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -288,6 +300,9 @@ async function addNewRoute() {
             document.getElementById('newDepartureLocation').value = '';
             document.getElementById('newDestination').value = '';
             document.getElementById('newDepartureTime').value = '';
+            document.getElementById('newDestinationTime').value = '';
+            document.getElementById('newBusCompany').value = '';
+            document.getElementById('newTickets').value = '';
         } 
         else 
         {
@@ -312,12 +327,19 @@ function getFormData(isNewRoute)
     const destination = isNewRoute ? document.getElementById('newDestination').value : document.getElementById('destination').value;
     let departureTime = isNewRoute ? document.getElementById('newDepartureTime').value : document.getElementById('departureTime').value;
     departureTime = departureTime.replace('T', ' '); 
+    const tickets = isNewRoute ? document.getElementById('newTickets').value : document.getElementById('tickets').value;
+    const buscompany = isNewRoute ? document.getElementById('newBusCompany').value : document.getElementById('busCompany').value;
+    const destinationtime = isNewRoute ? document.getElementById('newDestinationTime').value : document.getElementById('destinationTime').value;
+    destinationtime = destinationtime.replace('T', ' '); 
 
     const formData = 
     {
         departure_location: departureLocation,
         destination: destination,
-        departure_time: departureTime
+        departure_time: departureTime,
+        destinationtime: destinationtime,
+        buscompany: buscompany,
+        tickets: tickets
     };
 
     if (!isNewRoute) 
@@ -346,6 +368,7 @@ async function loginUser() {
         if (response.status === 200) 
         {
             alert(data.message);
+            $('#loginModal').modal('hide'); 
             renderLogs();
             saveUser(username, password, data.role);
             fetchRoutes(username, password);
@@ -380,6 +403,7 @@ async function registerUser(username, password, role)
         if (response.status === 201) 
         {
             alert(data.message);
+            $('#registerModal').modal('hide'); 
         } 
         else 
         {

@@ -40,9 +40,12 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Departure Location</th>
-                    <th>Destination</th>
                     <th>Departure Time</th>
+                    <th>Destination Time</th>
+                    <th>Departure Location</th>
+                    <th>Destination Location</th>
+                    <th>Bus Company</th>
+                    <th>Available tickets</th>
                     <th>Delete</th>
                 </tr>
             </thead>
@@ -87,6 +90,18 @@
                             <label for="departureTime">Departure Time:</label>
                             <input type="datetime-local" class="form-control" id="departureTime" placeholder="Enter Departure Time">
                         </div>
+                        <div class="mb-3">
+                            <label for="destinationTime">Destination Time:</label>
+                            <input type="datetime-local" class="form-control" id="destinationTime" placeholder="Enter Destination Time">
+                        </div>
+                        <div class="mb-3">
+                            <label for="busCompany">Bus Company:</label>
+                            <input type="text" class="form-control" id="busCompany" placeholder="Enter Bus Company">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tickets">Tickets count:</label>
+                            <input type="number" class="form-control" id="tickets" placeholder="Enter Tickets Count">
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -111,6 +126,18 @@
             <div class="mb-3">
                 <label for="newDepartureTime">Departure Time:</label>
                 <input type="datetime-local" class="form-control" id="newDepartureTime" placeholder="Enter Departure Time">
+            </div>
+            <div class="mb-3">
+                <label for="newDestinationTime">Destination Time:</label>
+                <input type="datetime-local" class="form-control" id="newDestinationTime" placeholder="Enter Destination Time">
+            </div>
+            <div class="mb-3">
+                <label for="newBusCompany">Bus Company:</label>
+                <input type="text" class="form-control" id="newBusCompany" placeholder="Enter Bus Company">
+            </div>
+            <div class="mb-3">
+                <label for="newTickets">Tickets count:</label>
+                <input type="number" class="form-control" id="newTickets" placeholder="Enter Tickets Count">
             </div>
             <button type="button" class="btn btn-primary" onclick="addNewRoute()">Add Route</button>
         </form>
