@@ -92,19 +92,19 @@ function renderRoutes(routesData, userRole)
     routesData.forEach(route => {
         const row = `
             <tr>
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureTime}</td>` : `<td>${route.departureTime}</td>`}  
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destinationTime}</td>` : `<td>${route.destinationTime}</td>`}
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureLocation}</td>` : `<td>${route.departureLocation}</td>`}                           
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destination}</td>` : `<td>${route.destination}</td>`}                                          
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.busCompany}</td>` : `<td>${route.busCompany}</td>`}                           
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.ticketsCount}</td>` : `<td>${route.ticketsCount}</td>`}                                                    
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureTime}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.departureTime}</td>`}  
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destinationTime}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.destinationTime}</td>`}
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureLocation}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.departureLocation}</td>`}                           
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destination}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.destination}</td>`}                                          
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.busCompany}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.busCompany}</td>`}                           
+                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.ticketsCount}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.ticketsCount}</td>`}                                                    
                 ${userRole === 'employee' ? `<td><button class="btn btn-danger" onclick="deleteRoute(${route.id})">Delete</button></td>` : ''}
             </tr>
         `;
         routesTable.innerHTML += row;
     });
 
-    const deleteColumnHeader = document.querySelector('th:nth-child(4)');
+    const deleteColumnHeader = document.querySelector('th:nth-child(7)');
     if (userRole !== 'employee') 
     {
         deleteColumnHeader.style.display = 'none';
@@ -329,7 +329,7 @@ function getFormData(isNewRoute)
     departureTime = departureTime.replace('T', ' '); 
     const tickets = isNewRoute ? document.getElementById('newTickets').value : document.getElementById('tickets').value;
     const buscompany = isNewRoute ? document.getElementById('newBusCompany').value : document.getElementById('busCompany').value;
-    const destinationtime = isNewRoute ? document.getElementById('newDestinationTime').value : document.getElementById('destinationTime').value;
+    let destinationtime = isNewRoute ? document.getElementById('newDestinationTime').value : document.getElementById('destinationTime').value;
     destinationtime = destinationtime.replace('T', ' '); 
 
     const formData = 
@@ -552,3 +552,185 @@ function filterAlphabetically()
 
     sortAlphabeticallyAscending = !sortAlphabeticallyAscending;
 }             
+
+function searchByDateTime() 
+{
+    let departureTime, destinationTime, table, tr, td, i, departureValue, destinationValue;
+    departureTime = new Date(document.getElementById("departureTimeSearch").value);
+    destinationTime = new Date(document.getElementById("destinationTimeSearch").value);
+    table = document.querySelector("table");
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 1; i < tr.length; i++) 
+    {
+        let found = false;
+        departureValue = new Date(tr[i].getElementsByTagName("td")[0].textContent);
+        destinationValue = new Date(tr[i].getElementsByTagName("td")[1].textContent);
+        departureValue.setHours(0, 0, 0, 0);
+        destinationValue.setHours(0, 0, 0, 0);
+        departureTime.setHours(0, 0, 0, 0);
+        destinationTime.setHours(0, 0, 0, 0);
+        
+        if 
+        (
+            (departureValue.getTime() >= departureTime.getTime()) &&
+            (destinationValue.getTime() <= destinationTime.getTime())
+        ) 
+        {
+            found = true;
+        }
+
+        if (found) 
+        {
+            tr[i].style.display = "";
+        } 
+        else 
+        {
+            tr[i].style.display = "none";
+        }
+    }
+}
+  
+async function showBuyTicketModal(routeId) 
+{
+    const response = await fetch(`http://localhost:32149/Routes/routes/${routeId}`);
+    const route = await response.json();
+
+    const modalBody = document.querySelector('#buyTicketModal .modal-body');
+    modalBody.innerHTML = `
+        <table class="table table-striped">
+            <tr><th>Departure Time</th><td>${route.departureTime}</td></tr>
+            <tr><th>Destination Time</th><td>${route.destinationTime}</td></tr>
+            <tr><th>Departure Location</th><td>${route.departureLocation}</td></tr>
+            <tr><th>Destination</th><td>${route.destination}</td></tr>
+            <tr><th>Bus Company</th><td>${route.busCompany}</td></tr>
+            <tr><th>Tickets available</th><td>${route.ticketsCount}</td></tr>
+        </table>
+        <div>
+            <label for="ticketCategory">Choose ticket category:</label>
+            <select id="ticketCategory" onchange="calculatePrice()">
+                <option value="Regular">Regular</option>
+                <option value="Student/Pensioner">Student/Pensioner</option>
+                <option value="Child">Child</option>
+            </select>
+        </div>
+        <div>
+            <label for="seatCount">Enter number of tickets:</label>
+            <input type="number" id="seatCount" min="1" max="${route.ticketsCount}" value="1" onchange="calculatePrice()">
+        </div>
+        <div>
+            <label id="priceLabel">Price: </label>
+        </div>
+    `;
+
+    const modalBodyFooter = document.querySelector('#buyTicketModal .modal-footer');
+    modalBodyFooter.innerHTML = `
+        <button type="button" class="btn btn-primary" onclick="buyTicket(${routeId})">Buy Ticket</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    `; 
+
+    const buyTicketModal = new bootstrap.Modal(document.getElementById('buyTicketModal'));
+    buyTicketModal.show();
+}
+
+function calculatePrice() 
+{
+    const ticketCategory = document.getElementById('ticketCategory').value;
+    const seatCount = document.getElementById('seatCount').value;
+    let price;
+    
+    switch (ticketCategory) 
+    {
+        case 'Student/Pensioner':
+            price = 6;
+            break;
+        case 'Regular':
+            price = 10;
+            break;
+        case 'Child':
+            price = 2;
+            break;
+        default:
+            price = 0;
+    }
+
+    const totalPrice = price * seatCount;
+    const priceLabel = document.getElementById('priceLabel');
+    priceLabel.textContent = `Price: ${totalPrice} EUR`;
+}
+
+
+async function buyTicket(routeId) {
+    const seatCount = document.getElementById('seatCount').value;
+
+    const response = await fetch(`http://localhost:32149/Routes/routes/${routeId}`);
+    const route = await response.json();
+
+    if (route.ticketsCount < seatCount) 
+    {
+        alert('Not enough tickets available!');
+        return;
+    }
+
+    const updatedTicketsCount = route.ticketsCount - seatCount;
+    const user = getUser();
+
+    const updatedRouteData = 
+    {
+        id: routeId,
+        departure_location: route.departureLocation,
+        destination: route.destination,
+        departure_time: route.departureTime,
+        username: user.username, 
+        destinationtime: route.destinationTime,
+        buscompany: route.busCompany,
+        tickets: updatedTicketsCount
+    };
+
+    const updateResponse = await fetch(`http://localhost:32149/Routes/routes/${updatedRouteData.id}/${updatedRouteData.departure_location}/${updatedRouteData.destination}/${updatedRouteData.departure_time}/${updatedRouteData.username}/${updatedRouteData.destinationtime}/${updatedRouteData.buscompany}/${updatedRouteData.tickets}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    if (updateResponse.status === 200) 
+    {
+        const ticketCategory = document.getElementById('ticketCategory').value;
+        let price;
+
+        switch (ticketCategory) 
+        {
+            case 'Student/Pensioner':
+                price = 6;
+                break;
+            case 'Regular':
+                price = 10;
+                break;
+            case 'Child':
+                price = 2;
+                break;
+            default:
+                price = 0;
+        }
+
+        const totalPrice = price * seatCount;
+        fetchRoutes(user.username, user.password);
+        const payment = await fetch(`http://localhost:32149/Payment/${totalPrice}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        let paymentLink = await payment.text();
+        paymentLink = paymentLink.replace(/^"|"$/g, '');
+        window.open(paymentLink, '_blank');
+        $('#buyTicketModal').modal('hide'); 
+    } 
+    else 
+    {
+        alert('Failed to purchase tickets. Please try again.');
+    }
+}
+

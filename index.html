@@ -30,6 +30,17 @@
             <label for="routeSearch">Search routes:</label>
             <input type="text" class="form-control" id="routeSearch" placeholder="Enter route details" oninput="searchTable()">
         </div>
+        <div class="row">
+            <div class="col">
+                <label for="departureTimeSearch">Departure Time:</label>
+                <input type="date" class="form-control" id="departureTimeSearch">
+            </div>
+            <div class="col">
+                <label for="destinationTimeSearch">Destination Time:</label>
+                <input type="date" class="form-control" id="destinationTimeSearch">
+            </div>
+        </div>
+        <button class="btn btn-primary mt-3" onclick="searchByDateTime()">Search</button>
     </div>         
     <div class="container mt-4" id="sortRegular">
         <h2>Sort Routes</h2>
@@ -195,6 +206,20 @@
             </div>
         </div>
     </div>    
+    <div class="modal fade" id="buyTicketModal" tabindex="-1" aria-labelledby="buyTicketModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="buyTicketModalLabel">Buy Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
     <footer class="bg-secondary text-white py-3">
         <div class="container">
             <p class="text-center"> &copy; <script>document.write(new Date().getFullYear())</script> Mihhail Lastovski</p>
