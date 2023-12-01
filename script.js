@@ -90,18 +90,21 @@ function renderRoutes(routesData, userRole)
     routesTable.innerHTML = '';
 
     routesData.forEach(route => {
-        const row = `
-            <tr>
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureTime}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.departureTime}</td>`}  
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destinationTime}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.destinationTime}</td>`}
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureLocation}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.departureLocation}</td>`}                           
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destination}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.destination}</td>`}                                          
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.busCompany}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.busCompany}</td>`}                           
-                ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.ticketsCount}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.ticketsCount}</td>`}                                                    
-                ${userRole === 'employee' ? `<td><button class="btn btn-danger" onclick="deleteRoute(${route.id})">Delete</button></td>` : ''}
-            </tr>
-        `;
-        routesTable.innerHTML += row;
+        if(route.ticketsCount !== 0){
+            const row = `
+                <tr>
+                    ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureTime}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.departureTime}</td>`}  
+                    ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destinationTime}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.destinationTime}</td>`}
+                    ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.departureLocation}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.departureLocation}</td>`}                           
+                    ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.destination}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.destination}</td>`}                                          
+                    ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.busCompany}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.busCompany}</td>`}                           
+                    ${userRole === 'employee' ? `<td data-bs-toggle="modal" data-bs-target="#routeInfoModal" onclick="displayRouteInfo(${route.id})">${route.ticketsCount}</td>` : `<td onclick="showBuyTicketModal(${route.id})">${route.ticketsCount}</td>`}                                                    
+                    ${userRole === 'employee' ? `<td><button class="btn btn-danger" onclick="deleteRoute(${route.id})">Delete</button></td>` : ''}
+                </tr>
+            `;
+            routesTable.innerHTML += row;
+        }
+        
     });
 
     const deleteColumnHeader = document.querySelector('th:nth-child(7)');
@@ -478,7 +481,7 @@ function searchTable()
     for (i = 1; i < tr.length; i++) 
     {
         let found = false;
-        for (j = 0; j < 3; j++) 
+        for (j = 0; j < 6; j++) 
         {
             td = tr[i].getElementsByTagName("td")[j];
             if (td) 
